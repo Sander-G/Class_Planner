@@ -6,7 +6,7 @@ import Login from './components/Login'
 import Admin from './components/Admin'
 import Home from './components/Home'
 import NotFound from './components/NotFound'
-import { auth } from './firebaseConfig';
+import { auth } from '../firebaseConfig';
 
 function App() {
   const navigate = useNavigate();
