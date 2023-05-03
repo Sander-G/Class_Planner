@@ -1,1 +1,4 @@
 .DS_Store
+setenv.txt
+index.js
+functions/
