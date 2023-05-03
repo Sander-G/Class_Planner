@@ -6,24 +6,29 @@ import Login from './components/Login'
 import Admin from './components/Admin'
 import Home from './components/Home'
 import NotFound from './components/NotFound'
-import { auth } from '../firebaseConfig';
+import { initializeFirebaseApp } from '../firebaseConfig';
 
 function App() {
+   console.log('in app component', initializeFirebaseApp()); 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is logged in, redirect to home page
-        navigate('/home');
-      } else {
-        // User is logged out, redirect to login page
-        navigate('/');
-      }
-    });
-
-    return unsubscribe;
-  }, [navigate]);
+ useEffect(() => {
+   const fetchData = async () => {
+     const { auth } = await initializeFirebaseApp();
+     console.log('auth:', auth);
+     const unsubscribe = auth.onAuthStateChanged((user) => {
+       if (user) {
+         // User is logged in, redirect to home page
+         navigate('/home');
+       } else {
+         // User is logged out, redirect to login page
+         navigate('/');
+       }
+     });
+     return unsubscribe;
+   };
+   fetchData();
+ }, [navigate]);
 
 
   return (

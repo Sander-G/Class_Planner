@@ -2,3 +2,4 @@
 setenv.txt
 index.js
 functions/
+.env
