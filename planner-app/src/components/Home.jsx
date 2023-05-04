@@ -1,36 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
+
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import 'moment-timezone';
 import 'moment/locale/nl';
 
-
-
-
 const localizer = momentLocalizer(moment);
-
 
 export default function Home() {
   const [events, setEvents] = useState([
-    {
-      title: 'Class 1',
-      start: new Date(),
-      end: new Date(),
-    },
-    {
-      title: 'Class 2',
-      start: new Date(),
-      end: new Date(),
-    },
+    // {
+    //   title: 'Class 1',
+    //   start: new Date(),
+    //   end: new Date(),
+    // },
+    // {
+    //   title: 'Class 2',
+    //   start: new Date(),
+    //   end: new Date(),
+    // },
   ]);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      const { db } = await initializeFirebaseApp();
+      const querySnapshot = await getDocs(collection(db, 'classes'));
+      const classesData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.name,
+          start: data.start_time.toDate(),
+          end: data.end_time.toDate(),
+          max_spots: data.max_spots,
+          enrolled_users: data.enrolled_users,
+        };
+      });
+       console.log('Classes:', classesData);
+      setEvents(classesData);
+    };
+    fetchClasses();
+  }, []);
 
   const handleEventSelect = (event) => {
     console.log('Selected event:', event);
     // handle event click hier
-  }
-
+  };
 
   const handleLogout = async () => {
     try {
@@ -55,9 +73,8 @@ export default function Home() {
         views={['week', 'day']}
         events={events}
         onSelectEvent={handleEventSelect}
-        
-        
-      /><br />
+      />
+      <br />
       <button onClick={handleLogout}>Logout</button>
     </div>
   );
