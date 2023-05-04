@@ -14,6 +14,13 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/*  react big calendar current time indicator fix */ 
+.rbc-current-time-indicator {
+  background-color: #525252;
+  height: 1px;
+  z-index: 0;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
