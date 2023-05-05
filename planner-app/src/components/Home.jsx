@@ -6,7 +6,6 @@ import { collection, getDocs } from 'firebase/firestore';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import 'moment-timezone';
 import 'moment/locale/nl';
 const localizer = momentLocalizer(moment);
 
@@ -27,11 +26,12 @@ export default function Home() {
         const data = doc.data();
         return {
           id: doc.id,
-          title: data.name,
+          title: data.title,
           start: data.start_time.toDate(),
           end: data.end_time.toDate(),
           max_spots: data.max_spots,
           enrolled_users: data.enrolled_users,
+          available_spots: data.available_spots,
           
         };
       });
@@ -62,26 +62,7 @@ export default function Home() {
     }
   };
 
-  const modalStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: '#525252',
-      padding: '2rem',
-      zIndex: '7000',
-      position: 'fixed',
-      border: 'none',
-      boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.3)',
-      borderRadius: '4px',
-    },
-    overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-  };
+ 
 
 
   return (
@@ -106,3 +87,25 @@ export default function Home() {
     </div>
   );
 }
+
+
+ const modalStyles = {
+   content: {
+     top: '50%',
+     left: '50%',
+     right: 'auto',
+     bottom: 'auto',
+     marginRight: '-50%',
+     transform: 'translate(-50%, -50%)',
+     backgroundColor: '#525252',
+     padding: '2rem',
+     zIndex: '7000',
+     position: 'fixed',
+     border: 'none',
+     boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.3)',
+     borderRadius: '4px',
+   },
+   overlay: {
+     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+   },
+ };
