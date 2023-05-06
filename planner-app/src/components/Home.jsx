@@ -116,6 +116,7 @@ const modalStyles = {
     transform: 'translate(-50%, -50%)',
     backgroundColor: '#525252',
     padding: '2rem',
+    
     zIndex: '7000',
     position: 'fixed',
     border: 'none',
