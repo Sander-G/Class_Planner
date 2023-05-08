@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
@@ -53,8 +53,18 @@ const [recurring, setRecurring] = useState(false);
    setSelectedEvent(event);
     
    console.log('Selected event:', event);
+   const id = event.id;
+   console.log(id);
 
- };
+   
+
+     // Add a click event listener to the delete button
+     const deleteButton = document.getElementById('delete-button');
+     deleteButton.addEventListener('click', () => {
+       handleDeleteEvent(id);
+     });
+   };
+ 
 
 
  const handleAddClass = async () => {
@@ -130,6 +140,35 @@ const [recurring, setRecurring] = useState(false);
  };
 
 
+ const handleDeleteEvent = async (id) => {
+ 
+  try {
+     const { db } = await initializeFirebaseApp();
+     console.log(id)
+     await deleteDoc(doc(db, 'classes', id));
+     console.log('Class deleted with ID:', id);
+
+     const querySnapshot = await getDocs(collection(db, 'classes'));
+     const classesData = querySnapshot.docs.map((doc) => {
+       const data = doc.data();
+       return {
+         id: doc.id,
+         title: data.title,
+         teacher: data.teacher,
+         start: data.start_time.toDate(),
+         end: data.end_time.toDate(),
+         max_spots: data.max_spots,
+         enrolled_users: data.enrolled_users,
+         available_spots: data.available_spots,
+       };
+     });
+
+     setEvents(classesData);
+   } catch (error) {
+     console.error(error);
+   }
+ };
+
 
  const handleLogout = async () => {
    try {
@@ -167,6 +206,7 @@ const [recurring, setRecurring] = useState(false);
 
   return (
     <div>
+      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo' />
       <h2>Admin Page</h2>
       <Wrapper>
         <Calendar
@@ -187,33 +227,40 @@ const [recurring, setRecurring] = useState(false);
             <p>{selectedEvent.teacher}</p>
             <p>{selectedEvent.start.toString()}</p>
             <p>{selectedEvent.end.toString()}</p>
+            {selectedEvent.recurring && (
+              <div>
+                <input type='checkbox' id='deleteRecurring' />
+                <label htmlFor='deleteRecurring'>Delete all recurring events</label>
+              </div>
+            )}
+            <button id="delete-button">Verwijder!</button>
           </div>
         ) : null}
         <div>
           <Form onSubmit={handleAddClass}>
-            <h3>Add Class</h3>
-            <label htmlFor='title'>Class Name</label>
+            <h3>Yogales Toevoegen:</h3>
+            <label htmlFor='title'>Naam van de Yogales:</label>
             <input type='text' id='title' value={title} onChange={(e) => setTitle(e.target.value)} />
 
-            <label htmlFor='teacher-name'>Teacher Name</label>
+            <label htmlFor='teacher-name'>Docent:</label>
             <input type='text' id='teacher-name' value={teacherName} onChange={(e) => setTeacherName(e.target.value)} />
 
-            <label htmlFor='start-time'>Start Time</label>
+            <label htmlFor='start-time'>Start Tijd:</label>
             <DatePicker id='start-time' selected={startTime} onChange={(date) => setStartTime(date)} showTimeSelect timeFormat='HH:mm' timeIntervals={15} dateFormat='dd/MM/yyyy HH:mm' />
 
-            <label htmlFor='end-time'>End Time</label>
+            <label htmlFor='end-time'>Eind Tijd:</label>
             <DatePicker id='end-time' selected={endTime} onChange={(date) => setEndTime(date)} showTimeSelect timeFormat='HH:mm' timeIntervals={15} dateFormat='dd/MM/yyyy HH:mm' />
 
             <label htmlFor='recurring'>
-              Recurring Class
-              <input type='checkbox' id='recurring' checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
+              Herhalende Les?
+              <input type='checkbox' id='recurring' aria-label='elke week voor de rest van het jaar!'checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
             </label>
             <button type='submit'>Voeg toe!</button>
           </Form>
         </div>
 
         <div className='logoutButton'>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout}>Uitloggen</button>
         </div>
       </Wrapper>
     </div>
@@ -248,25 +295,42 @@ const Form = styled.form`
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: transparent;
     width: 100%;
+    position: relative;
   }
 
-  input[type='checkbox'] {
-    margin-top: 5px;
+  input[type='checkbox']::after {
+    content: 'Herhaal deze les elke week, voor de rest van het jaar!';
+    display: inline-block;
+    position: relative;
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    left: 5rem;
+    top: -2rem;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  input[type='checkbox']:hover::after {
+    opacity: 1;
   }
 
   button {
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #008CBA;
+    background-color: transparent;
     color: white;
-    border: none;
+    border: 1px solid white;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 
     &:hover {
-      background-color: #006B8E;
+      background-color: #006b8e;
     }
   }
 `;
