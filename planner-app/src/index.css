@@ -13,6 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+/* Logout button styling */
+
+.logoutButton {
+  display: block;
+  position: fixed;
+  top: .5rem;
+  right: .5rem;
+
+}
+
 
 /*  react big calendar current time indicator fix 
 & styling */ 
