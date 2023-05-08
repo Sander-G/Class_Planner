@@ -86,7 +86,8 @@ export default function Home() {
 
   return (
     <div>
-      <h2>Lotta Yoga Planner - Overzicht</h2>
+      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo' />
+      <h2>Planner - Overzicht</h2>
       <Calendar
         localizer={localizer}
         culture='nl'
