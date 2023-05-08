@@ -27,6 +27,7 @@ const Login = () => {
 
   return (
     <div className='loginScreen'>
+      <img src='/public/logo.png' alt='Lotta Yoga logo'/>
       <h1>Yoga Class Planner</h1>
       <p>Please sign in to access the planner</p>
       {error && <p>{error}</p>}
