@@ -10,10 +10,13 @@ justify-content: center;
 
 }
 
+.logo {
+  max-width: 3 rem;
+}
 
 .input {
   display: flex;
-  
+  align-items: center;
   justify-content: space-evenly;
 
 

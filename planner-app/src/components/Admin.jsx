@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
-import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, writeBatch, query, where } from 'firebase/firestore';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
@@ -22,6 +22,14 @@ const [teacherName, setTeacherName] = useState('');
 const [recurring, setRecurring] = useState(false);
 
 
+
+
+const generateClassId = (title) => {
+  const randomNumber = Math.floor(Math.random() * 1000);
+  const classId = `${title}_${randomNumber}`;
+  return classId;
+};
+
  
 
  useEffect(() => {
@@ -31,6 +39,7 @@ const [recurring, setRecurring] = useState(false);
      const classesData = querySnapshot.docs.map((doc) => {
        const data = doc.data();
        return {
+        class_id: data.class_id,
          id: doc.id,
          title: data.title,
          teacher: data.teacher,
@@ -49,28 +58,43 @@ const [recurring, setRecurring] = useState(false);
    fetchClasses();
  }, []);
 
+
+ useEffect(() => {
+   // Add a click event listener to the delete button
+   if (selectedEvent) {
+   const deleteButton = document.getElementById('delete-button');
+   deleteButton.addEventListener('click', handleDeleteEvent());
+   
+   return () => {
+     // Remove the event listener when the component unmounts
+     deleteButton.removeEventListener('click', handleDeleteEvent());
+   };
+}}, [selectedEvent]);
+
  const handleEventSelect = (event) => {
    setSelectedEvent(event);
     
    console.log('Selected event:', event);
-   const id = event.id;
-   console.log(id);
-
+   const id = event.class_id;
+   console.log('dit is het event class ID:', id);
+   
    
 
      // Add a click event listener to the delete button
-     const deleteButton = document.getElementById('delete-button');
-     deleteButton.addEventListener('click', () => {
-       handleDeleteEvent(id);
-     });
+    //  const deleteButton = document.getElementById('delete-button');
+    //  deleteButton.addEventListener('click', () => {
+    //    handleDeleteEvent(id);
+    //  });
    };
  
+
 
 
  const handleAddClass = async () => {
   event.preventDefault();
   console.log('form submitted!');
    const { db } = await initializeFirebaseApp();
+   const classId = generateClassId(title);
 
 
  if (recurring) {
@@ -79,11 +103,13 @@ const [recurring, setRecurring] = useState(false);
     const endOfYear = new Date(date.getFullYear() + 1, 0, 1);
     while (date < endOfYear) {
       const newClassRef = await addDoc(collection(db, 'classes'), {
+        class_id: classId,
         title: title,
         start_time: date,
         end_time: new Date(date.getTime() + (endTime - startTime)),
         teacher: teacherName,
         recurring,
+        max_spots: 10,
         available_spots: 10,
         enrolled_users: [],
       });
@@ -97,14 +123,19 @@ const [recurring, setRecurring] = useState(false);
     // If recurring is not checked, add a single class
 
    const newClassRef = await addDoc(collection(db, 'classes'), {
+     class_id: classId,
      title: title,
      start_time: startTime,
      end_time: endTime,
      teacher: teacherName,
      recurring,
+     max_spots: 10,
      available_spots: 10,
      enrolled_users: [],
    });
+   console.log('New class addid with ID:', newClassRef.id);
+  
+  }
 
    console.log('title:', title);
    console.log('start_time:', startTime);
@@ -112,8 +143,7 @@ const [recurring, setRecurring] = useState(false);
    console.log('teacherName:', teacherName);
    console.log('recurring:', recurring);
 
-   console.log('New class addid with ID:', newClassRef.id);
-  }
+   
    // Clear the form
    setTitle('');
    setStartTime(new Date());
@@ -126,6 +156,7 @@ const [recurring, setRecurring] = useState(false);
      const data = doc.data();
      return {
        id: doc.id,
+       class_id: data.class_id,
        title: data.title,
        teacher: data.teacher,
        start: data.start_time.toDate(),
@@ -140,19 +171,28 @@ const [recurring, setRecurring] = useState(false);
  };
 
 
- const handleDeleteEvent = async (id) => {
- 
-  try {
+ const handleDeleteEvent = async (class_id) => {
+   try {
      const { db } = await initializeFirebaseApp();
-     console.log(id)
-     await deleteDoc(doc(db, 'classes', id));
-     console.log('Class deleted with ID:', id);
+     console.log(selectedEvent);
+     const querySnapshot = await getDocs(query(collection(db, 'classes'), where('class_id', '==', selectedEvent.class_id)));
+    console.log(querySnapshot)
+     const batch = writeBatch(db);
 
-     const querySnapshot = await getDocs(collection(db, 'classes'));
-     const classesData = querySnapshot.docs.map((doc) => {
+     querySnapshot.forEach((doc) => {
+       batch.delete(doc.ref);
+       console.log('Class deleted with ID:', doc.id);
+     });
+
+     await batch.commit();
+
+     const newQuerySnapshot = await getDocs(collection(db, 'classes'));
+
+     const classesData = newQuerySnapshot.docs.map((doc) => {
        const data = doc.data();
        return {
          id: doc.id,
+         class_id: data.class_id,
          title: data.title,
          teacher: data.teacher,
          start: data.start_time.toDate(),
@@ -168,6 +208,7 @@ const [recurring, setRecurring] = useState(false);
      console.error(error);
    }
  };
+
 
 
  const handleLogout = async () => {
@@ -224,7 +265,10 @@ const [recurring, setRecurring] = useState(false);
         {selectedEvent ? (
           <div>
             <h3>{selectedEvent.title}</h3>
-            <p>{selectedEvent.teacher}</p>
+            <p>Class ID: {selectedEvent.class_id}</p>
+            <p>Docent: {selectedEvent.teacher}</p>
+            <p>Beschikbare plaatsen: {selectedEvent.available_spots} van: {selectedEvent.max_spots}</p>
+
             <p>{selectedEvent.start.toString()}</p>
             <p>{selectedEvent.end.toString()}</p>
             {selectedEvent.recurring && (
@@ -233,7 +277,7 @@ const [recurring, setRecurring] = useState(false);
                 <label htmlFor='deleteRecurring'>Delete all recurring events</label>
               </div>
             )}
-            <button id="delete-button">Verwijder!</button>
+            <button id='delete-button'>Verwijder!</button>
           </div>
         ) : null}
         <div>
@@ -253,7 +297,7 @@ const [recurring, setRecurring] = useState(false);
 
             <label htmlFor='recurring'>
               Herhalende Les?
-              <input type='checkbox' id='recurring' aria-label='elke week voor de rest van het jaar!'checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
+              <input type='checkbox' id='recurring' aria-label='elke week voor de rest van het jaar!' checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
             </label>
             <button type='submit'>Voeg toe!</button>
           </Form>

@@ -27,14 +27,14 @@ const Login = () => {
 
   return (
     <div className='loginScreen'>
-      <img src='/public/logo.png' alt='Lotta Yoga logo'/>
+      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo'/>
       <h1>Yoga Class Planner</h1>
       <p>Please sign in to access the planner</p>
       {error && <p>{error}</p>}
       <form onSubmit={handleLogin}>
         <div className='input'>
           <label>
-            Email:
+            Email: 
             <input type='email' name='username' autoComplete='username' value={email} onChange={handleEmailChange} />
           </label>
         </div>
