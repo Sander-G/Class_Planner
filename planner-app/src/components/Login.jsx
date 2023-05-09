@@ -2,12 +2,14 @@ import './Login.css'
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeFirebaseApp } from '../../firebaseConfig';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -20,6 +22,7 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log('Logged in as', user.uid);
+       navigate('/home');
     } catch (err) {
       setError(err.message);
     }
@@ -27,7 +30,7 @@ const Login = () => {
 
   return (
     <div className='loginScreen'>
-      <img src='/public/logo.png' alt='Lotta Yoga logo'/>
+      <img src='/public/logo.png' alt='Lotta Yoga logo' />
       <h1>Yoga Class Planner</h1>
       <p>Please sign in to access the planner</p>
       {error && <p>{error}</p>}
@@ -38,7 +41,7 @@ const Login = () => {
             <input type='email' name='username' autoComplete='username' value={email} onChange={handleEmailChange} />
           </label>
         </div>
-      <br/>
+        <br />
         <div className='input'>
           <label>
             Password:
@@ -49,6 +52,9 @@ const Login = () => {
 
         <button type='submit'>Sign In</button>
       </form>
+      <p>
+        Don&apos;t have an account? <Link to='/signup'>Sign up here</Link>
+      </p>
     </div>
   );
 };
