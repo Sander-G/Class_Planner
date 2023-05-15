@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
-
-
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
@@ -86,7 +84,7 @@ export default function Home() {
 
   return (
     <div>
-      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo' />
+      <img src='/logo.png' className='logo' alt='Lotta Yoga logo' />
       <h2>Planner - Overzicht</h2>
       <Calendar
         localizer={localizer}

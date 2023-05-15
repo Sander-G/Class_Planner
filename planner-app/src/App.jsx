@@ -8,6 +8,7 @@ import Home from './components/Home'
 import NotFound from './components/NotFound'
 import { initializeFirebaseApp } from '../firebaseConfig';
 
+
 function App() {
 
 
@@ -33,6 +34,7 @@ function App() {
   return (
     <>
       <Routes>
+       
         <Route exact path='/' element={<Login />} />
         <Route exact path='/signup' element={<Signup />} />
         <Route exact path='/home' element={<Home />} />
