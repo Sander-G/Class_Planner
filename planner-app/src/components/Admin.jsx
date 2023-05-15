@@ -63,11 +63,13 @@ const generateClassId = (title) => {
    // Add a click event listener to the delete button
    if (selectedEvent) {
    const deleteButton = document.getElementById('delete-button');
-   deleteButton.addEventListener('click', handleDeleteEvent());
+   deleteButton.addEventListener('click', () => {
+    handleDeleteEvent(selectedEvent)
+   });
    
    return () => {
      // Remove the event listener when the component unmounts
-     deleteButton.removeEventListener('click', handleDeleteEvent());
+     deleteButton.removeEventListener('click', handleDeleteEvent);
    };
 }}, [selectedEvent]);
 
@@ -175,7 +177,9 @@ const generateClassId = (title) => {
    try {
      const { db } = await initializeFirebaseApp();
      console.log(selectedEvent);
-     const querySnapshot = await getDocs(query(collection(db, 'classes'), where('class_id', '==', selectedEvent.class_id)));
+     console.log(selectedEvent.class_id);
+     const querySnapshot = await getDocs(
+      query(collection(db, 'classes'), where('class_id', '==', selectedEvent.class_id)));
     console.log(querySnapshot)
      const batch = writeBatch(db);
 
@@ -185,7 +189,7 @@ const generateClassId = (title) => {
      });
 
      await batch.commit();
-
+     setSelectedEvent(null);
      const newQuerySnapshot = await getDocs(collection(db, 'classes'));
 
      const classesData = newQuerySnapshot.docs.map((doc) => {
