@@ -8,6 +8,7 @@ import 'moment/locale/nl';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { styled } from 'styled-components';
+import UserList from './UserList';
 
 export default function Admin() {
 moment.locale('nl');
@@ -306,7 +307,7 @@ const generateClassId = (title) => {
             <button type='submit'>Voeg toe!</button>
           </Form>
         </div>
-
+        <UserList/>
         <div className='logoutButton'>
           <button onClick={handleLogout}>Uitloggen</button>
         </div>
