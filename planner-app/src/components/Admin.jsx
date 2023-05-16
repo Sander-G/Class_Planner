@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { styled } from 'styled-components';
 import UserList from './UserList';
+import EnrolledUsers from './EnrolledUsers';
 
 export default function Admin() {
 moment.locale('nl');
@@ -272,10 +273,17 @@ const generateClassId = (title) => {
             <h3>{selectedEvent.title}</h3>
             <p>Class ID: {selectedEvent.class_id}</p>
             <p>Docent: {selectedEvent.teacher}</p>
-            <p>Beschikbare plaatsen: {selectedEvent.available_spots} van: {selectedEvent.max_spots}</p>
+            <p>
+              Beschikbare plaatsen: {selectedEvent.available_spots} van: {selectedEvent.max_spots}
+            </p>
+            {/* {selectedEvent.enrolled_users.map((uid) => (
+              <p key={uid}>{selectedEvent.name}</p>
+            ))} */}
 
-            <p>{selectedEvent.start.toString()}</p>
-            <p>{selectedEvent.end.toString()}</p>
+            <EnrolledUsers selectedEvent={selectedEvent} />
+            <p>{selectedEvent.start.toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' })}</p>
+            <p>{selectedEvent.end.toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' })}</p>
+
             {selectedEvent.recurring && (
               <div>
                 <input type='checkbox' id='deleteRecurring' />
@@ -307,7 +315,7 @@ const generateClassId = (title) => {
             <button type='submit'>Voeg toe!</button>
           </Form>
         </div>
-        <UserList/>
+        <UserList />
         <div className='logoutButton'>
           <button onClick={handleLogout}>Uitloggen</button>
         </div>
