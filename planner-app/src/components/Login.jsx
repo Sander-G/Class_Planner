@@ -44,7 +44,7 @@ const Login = () => {
 
   return (
     <div className='loginScreen'>
-      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo' />
+      <img src='/logo.png' className='logo' alt='Lotta Yoga logo' />
       <h1>Planner</h1>
       {showResetForm ? (
         <>

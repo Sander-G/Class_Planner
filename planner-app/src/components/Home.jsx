@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'moment/locale/nl'; 
 import Modal from 'react-modal';
 import ClassInfoPopup from './ClassInfoPopup';
+import './Home.css'
 
 moment.locale('nl');
 const localizer = momentLocalizer(moment);
@@ -83,21 +84,23 @@ export default function Home() {
   };
    
   return (
-    <div>
+    <div className='home-container'>
       <img src='/logo.png' className='logo' alt='Lotta Yoga logo' />
       <h2>Planner - Overzicht</h2>
-      <Calendar
-        localizer={localizer}
-        messages={messages}
-        formats={formats}
-        min={new Date(0, 0, 0, 8)} // 8:00 AM
-        max={new Date(0, 0, 0, 22)} // 10:00 PM
-        step={45}
-        defaultView='week'
-        views={['week', 'day']}
-        events={events}
-        onSelectEvent={handleEventSelect}
-      />
+      <div className='calendar-container'>
+        <Calendar
+          localizer={localizer}
+          messages={messages}
+          formats={formats}
+          min={new Date(0, 0, 0, 8)} // 8:00 AM
+          max={new Date(0, 0, 0, 22)} // 10:00 PM
+          step={45}
+          defaultView='week'
+          views={['week', 'day']}
+          events={events}
+          onSelectEvent={handleEventSelect}
+        />
+      </div>
       <Modal isOpen={selectedEvent !== null} onRequestClose={handleClosePopup} style={modalStyles}>
         {selectedEvent && <ClassInfoPopup event={selectedEvent} />}
       </Modal>
