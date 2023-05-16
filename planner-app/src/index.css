@@ -29,7 +29,7 @@
 .rbc-current-time-indicator {
   background-color: #fff;
   height: 1px;
-  z-index: 0;
+  /* z-index: 0; */
 }
 
 .rbc-today {

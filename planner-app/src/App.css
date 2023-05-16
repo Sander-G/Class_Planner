@@ -10,6 +10,7 @@ body {
   background-image: url('/planner_bg.png');
   background-size: cover;
   background-position: bottom right;
+  
 }
 .logo {
   max-height: 4em;
