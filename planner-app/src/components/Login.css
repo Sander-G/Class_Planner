@@ -3,20 +3,40 @@
 display: flex;
 flex-direction: column;
 align-items: center;
-gap: 1rem;
-justify-content: center;
+text-align: center;
+
+
+
 
  
 
 }
 
-
+.loginScreen h1 {
+  font-size: 2.5rem;
+}
 .input {
   display: flex;
-  
-  justify-content: space-evenly;
+  justify-content: flex-end;
+  background-color: transparent;
 
 
 }
 
+.resetInput {
+  display: flex;
+  
+  justify-content: center;
+}
+label {
+  text-align: left;
+ margin-right: 10px;
+  flex-shrink: 0;
+
+}
+
+.bottomWrapper {
+  position: fixed;
+  bottom: 0; 
+}
 
