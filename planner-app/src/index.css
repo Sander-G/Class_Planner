@@ -14,12 +14,47 @@
   -webkit-text-size-adjust: 100%;
 }
 
-/*  react big calendar current time indicator fix */ 
+/*  react big calendar current time indicator fix 
+& styling */ 
 .rbc-current-time-indicator {
-  background-color: #525252;
+  background-color: #fff;
   height: 1px;
   z-index: 0;
 }
+
+.rbc-today {
+  background-color: #525252;
+}
+
+.rbc-toolbar button {
+  color: rgba(255, 255, 255, 0.87)
+}
+
+button.rbc-active {
+  color : #242424;
+}
+
+/* popup styling */
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.classInfo {
+
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+.classInfo h3 {
+      text-align: center;
+    }
+
 
 a {
   font-weight: 500;
