@@ -3,6 +3,38 @@ import { useState } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 import { signInWithEmailAndPassword, sendPasswordResetEmail} from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
+
+
+
+
+const SuccessMessage = styled.p`
+  color: white;
+
+  padding: 10px;
+  display: ${(props) => (props.show ? 'block' : 'none')};
+`;
+
+// Spinner
+const spinAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const Spinner = styled.div`
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: ${spinAnimation} 2s linear infinite;
+  margin-right: 5px;
+`;
+
 
 
 const Login = () => {
@@ -10,6 +42,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [showResetForm, setShowResetForm] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const navigate = useNavigate();
 
@@ -36,7 +70,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const { auth } = await initializeFirebaseApp();
+      setLoading(true);
       await sendPasswordResetEmail(auth, resetEmail);
+      setLoading(false);
+      setShowConfirmation(true);
+      setResetEmail('');
     } catch (err) {
       setError(err.message);
     }
@@ -57,12 +95,21 @@ const Login = () => {
 
               <input type='email' name='reset-email' className='input' autoComplete='email' value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
             </div>
-
-            <br />
-            <button type='submit'>Verstuur!</button>
+<div>
+              <button type='submit' className='resetButton'>
+                {loading ? (
+                  <>
+                    <Spinner />
+                  </>
+                ) : (
+                  'Verstuur!'
+                )}
+              </button>
+            </div>
           </form>
-          
+
           <p>
+              <SuccessMessage show={showConfirmation}>Wachtwoord reset mail verzonden!</SuccessMessage>
             <Link onClick={() => setShowResetForm(false)}>Terug naar inloggen</Link>
           </p>
         </>
