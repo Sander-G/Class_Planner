@@ -25,9 +25,16 @@ export default function Home() {
   useEffect(() => {
     const fetchClasses = async () => {
       const { db } = await initializeFirebaseApp();
+      // console.log(db)
       const querySnapshot = await getDocs(collection(db, 'classes'));
       const classesData = querySnapshot.docs.map((doc) => {
         const data = doc.data();
+
+        const enrolledUsersCount = data.enrolled_users.length;
+        const availableSpots = data.max_spots - enrolledUsersCount;
+        console.log('Classes:', data.enrolled_users);
+       
+       
         return {
           id: doc.id,
           title: data.title,
@@ -35,16 +42,15 @@ export default function Home() {
           end: data.end_time.toDate(),
           max_spots: data.max_spots,
           enrolled_users: data.enrolled_users,
-          available_spots: data.available_spots,
+          available_spots: availableSpots
         };
       });
-
-      console.log('Classes:', classesData);
+      
       setEvents(classesData);
     };
     fetchClasses();
   }, []);
-
+  
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
     console.log('Selected event:', event);
