@@ -54,7 +54,7 @@ const EnrolledUsers = ({ selectedEvent }) => {
 };
 
 EnrolledUsers.propTypes = {
-  selectedEvent: PropTypes.object, // Update the prop type based on your requirements
+  selectedEvent: PropTypes.object,
 };
 
 export default EnrolledUsers;

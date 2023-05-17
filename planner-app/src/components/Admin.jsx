@@ -4,252 +4,233 @@ import { collection, getDocs, addDoc, writeBatch, query, where } from 'firebase/
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import 'moment/locale/nl'; 
+import 'moment/locale/nl';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { styled } from 'styled-components';
 import UserList from './UserList';
 import EnrolledUsers from './EnrolledUsers';
+import './Admin.css'
 
 export default function Admin() {
-moment.locale('nl');
-const localizer = momentLocalizer(moment);
-const [events, setEvents] = useState([]);
-const [selectedEvent, setSelectedEvent] = useState(null);
+  moment.locale('nl');
+  const localizer = momentLocalizer(moment);
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-const [title, setTitle] = useState('');
-const [startTime, setStartTime] = useState(new Date());
-const [endTime, setEndTime] = useState(new Date());
-const [teacherName, setTeacherName] = useState('');
-const [recurring, setRecurring] = useState(false);
+  const [title, setTitle] = useState('');
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+  const [teacherName, setTeacherName] = useState('');
+  const [recurring, setRecurring] = useState(false);
 
+  const generateClassId = (title) => {
+    const randomNumber = Math.floor(Math.random() * 1000);
+    const classId = `${title}_${randomNumber}`;
+    return classId;
+  };
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      const { db } = await initializeFirebaseApp();
+      const querySnapshot = await getDocs(collection(db, 'classes'));
+      const classesData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          class_id: data.class_id,
+          id: doc.id,
+          title: data.title,
+          teacher: data.teacher,
+          start: data.start_time.toDate(),
+          end: data.end_time.toDate(),
+          max_spots: data.max_spots,
+          enrolled_users: data.enrolled_users,
+          available_spots: data.available_spots,
+        };
+      });
 
+      console.log('Classes:', classesData);
+      console.log(db);
+      setEvents(classesData);
+    };
+    fetchClasses();
+  }, []);
 
-const generateClassId = (title) => {
-  const randomNumber = Math.floor(Math.random() * 1000);
-  const classId = `${title}_${randomNumber}`;
-  return classId;
-};
+  useEffect(() => {
+    // Add a click event listener to the delete button
+    if (selectedEvent) {
+      const deleteButton = document.getElementById('delete-button');
+      deleteButton.addEventListener('click', () => {
+        handleDeleteEvent(selectedEvent);
+      });
 
- 
+      return () => {
+        // Remove the event listener when the component unmounts
+        deleteButton.removeEventListener('click', handleDeleteEvent);
+      };
+    }
+  }, [selectedEvent]);
 
- useEffect(() => {
-   const fetchClasses = async () => {
-     const { db } = await initializeFirebaseApp();
-     const querySnapshot = await getDocs(collection(db, 'classes'));
-     const classesData = querySnapshot.docs.map((doc) => {
-       const data = doc.data();
-       return {
-        class_id: data.class_id,
-         id: doc.id,
-         title: data.title,
-         teacher: data.teacher,
-         start: data.start_time.toDate(),
-         end: data.end_time.toDate(),
-         max_spots: data.max_spots,
-         enrolled_users: data.enrolled_users,
-         available_spots: data.available_spots,
-       };
-     });
+  const handleEventSelect = (event) => {
+    setSelectedEvent(event);
 
-     console.log('Classes:', classesData);
-     console.log(db)
-     setEvents(classesData);
-   };
-   fetchClasses();
- }, []);
+    console.log('Selected event:', event);
+    const id = event.class_id;
+    console.log('dit is het event class ID:', id);
 
-
- useEffect(() => {
-   // Add a click event listener to the delete button
-   if (selectedEvent) {
-   const deleteButton = document.getElementById('delete-button');
-   deleteButton.addEventListener('click', () => {
-    handleDeleteEvent(selectedEvent)
-   });
-   
-   return () => {
-     // Remove the event listener when the component unmounts
-     deleteButton.removeEventListener('click', handleDeleteEvent);
-   };
-}}, [selectedEvent]);
-
- const handleEventSelect = (event) => {
-   setSelectedEvent(event);
-    
-   console.log('Selected event:', event);
-   const id = event.class_id;
-   console.log('dit is het event class ID:', id);
-   
-   
-
-     // Add a click event listener to the delete button
+    // Add a click event listener to the delete button
     //  const deleteButton = document.getElementById('delete-button');
     //  deleteButton.addEventListener('click', () => {
     //    handleDeleteEvent(id);
     //  });
-   };
- 
+  };
 
+  const handleAddClass = async () => {
+    event.preventDefault();
+    console.log('form submitted!');
+    const { db } = await initializeFirebaseApp();
+    const classId = generateClassId(title);
 
+    if (recurring) {
+      // If recurring is checked, add classes for the rest of the year
+      const date = new Date(startTime);
+      const endOfYear = new Date(date.getFullYear() + 1, 0, 1);
+      while (date < endOfYear) {
+        const newClassRef = await addDoc(collection(db, 'classes'), {
+          class_id: classId,
+          title: title,
+          start_time: date,
+          end_time: new Date(date.getTime() + (endTime - startTime)),
+          teacher: teacherName,
+          recurring,
+          max_spots: 10,
+          available_spots: 10,
+          enrolled_users: [],
+        });
 
- const handleAddClass = async () => {
-  event.preventDefault();
-  console.log('form submitted!');
-   const { db } = await initializeFirebaseApp();
-   const classId = generateClassId(title);
+        console.log('New class added with ID:', newClassRef.id);
 
+        // Increment the date by one week
+        date.setDate(date.getDate() + 7);
+      }
+    } else {
+      // If recurring is not checked, add a single class
 
- if (recurring) {
-    // If recurring is checked, add classes for the rest of the year
-    const date = new Date(startTime);
-    const endOfYear = new Date(date.getFullYear() + 1, 0, 1);
-    while (date < endOfYear) {
       const newClassRef = await addDoc(collection(db, 'classes'), {
         class_id: classId,
         title: title,
-        start_time: date,
-        end_time: new Date(date.getTime() + (endTime - startTime)),
+        start_time: startTime,
+        end_time: endTime,
         teacher: teacherName,
         recurring,
         max_spots: 10,
         available_spots: 10,
         enrolled_users: [],
       });
-
-      console.log('New class added with ID:', newClassRef.id);
-
-      // Increment the date by one week
-      date.setDate(date.getDate() + 7);
+      console.log('New class addid with ID:', newClassRef.id);
     }
-  } else {
-    // If recurring is not checked, add a single class
 
-   const newClassRef = await addDoc(collection(db, 'classes'), {
-     class_id: classId,
-     title: title,
-     start_time: startTime,
-     end_time: endTime,
-     teacher: teacherName,
-     recurring,
-     max_spots: 10,
-     available_spots: 10,
-     enrolled_users: [],
-   });
-   console.log('New class addid with ID:', newClassRef.id);
-  
-  }
+    console.log('title:', title);
+    console.log('start_time:', startTime);
+    console.log('end_time:', endTime);
+    console.log('teacherName:', teacherName);
+    console.log('recurring:', recurring);
 
-   console.log('title:', title);
-   console.log('start_time:', startTime);
-   console.log('end_time:', endTime);
-   console.log('teacherName:', teacherName);
-   console.log('recurring:', recurring);
+    // Clear the form
+    setTitle('');
+    setStartTime(new Date());
+    setEndTime(new Date());
+    setTeacherName('');
+    setRecurring(false);
 
-   
-   // Clear the form
-   setTitle('');
-   setStartTime(new Date());
-   setEndTime(new Date());
-   setTeacherName('');
-   setRecurring(false);
+    const querySnapshot = await getDocs(collection(db, 'classes'));
+    const classesData = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        class_id: data.class_id,
+        title: data.title,
+        teacher: data.teacher,
+        start: data.start_time.toDate(),
+        end: data.end_time.toDate(),
+        max_spots: data.max_spots,
+        enrolled_users: data.enrolled_users,
+        available_spots: data.available_spots,
+      };
+    });
 
-   const querySnapshot = await getDocs(collection(db, 'classes'));
-   const classesData = querySnapshot.docs.map((doc) => {
-     const data = doc.data();
-     return {
-       id: doc.id,
-       class_id: data.class_id,
-       title: data.title,
-       teacher: data.teacher,
-       start: data.start_time.toDate(),
-       end: data.end_time.toDate(),
-       max_spots: data.max_spots,
-       enrolled_users: data.enrolled_users,
-       available_spots: data.available_spots,
-     };
-   });
+    setEvents(classesData);
+  };
 
-   setEvents(classesData);
- };
+  const handleDeleteEvent = async (class_id) => {
+    try {
+      const { db } = await initializeFirebaseApp();
+      console.log(selectedEvent);
+      console.log(selectedEvent.class_id);
+      const querySnapshot = await getDocs(query(collection(db, 'classes'), where('class_id', '==', class_id)));
+      console.log(querySnapshot);
+      const batch = writeBatch(db);
 
+      querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+        console.log('Class deleted with ID:', doc.id);
+      });
 
- const handleDeleteEvent = async (class_id) => {
-   try {
-     const { db } = await initializeFirebaseApp();
-     console.log(selectedEvent);
-     console.log(selectedEvent.class_id);
-     const querySnapshot = await getDocs(
-      query(collection(db, 'classes'), where('class_id', '==', selectedEvent.class_id)));
-    console.log(querySnapshot)
-     const batch = writeBatch(db);
+      await batch.commit();
+      setSelectedEvent(null);
+      const newQuerySnapshot = await getDocs(collection(db, 'classes'));
 
-     querySnapshot.forEach((doc) => {
-       batch.delete(doc.ref);
-       console.log('Class deleted with ID:', doc.id);
-     });
+      const classesData = newQuerySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          class_id: data.class_id,
+          title: data.title,
+          teacher: data.teacher,
+          start: data.start_time.toDate(),
+          end: data.end_time.toDate(),
+          max_spots: data.max_spots,
+          enrolled_users: data.enrolled_users,
+          available_spots: data.available_spots,
+        };
+      });
 
-     await batch.commit();
-     setSelectedEvent(null);
-     const newQuerySnapshot = await getDocs(collection(db, 'classes'));
+      setEvents(classesData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-     const classesData = newQuerySnapshot.docs.map((doc) => {
-       const data = doc.data();
-       return {
-         id: doc.id,
-         class_id: data.class_id,
-         title: data.title,
-         teacher: data.teacher,
-         start: data.start_time.toDate(),
-         end: data.end_time.toDate(),
-         max_spots: data.max_spots,
-         enrolled_users: data.enrolled_users,
-         available_spots: data.available_spots,
-       };
-     });
+  const handleLogout = async () => {
+    try {
+      const { auth } = await initializeFirebaseApp();
+      await auth.signOut();
+      console.log('User logged out successfully');
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-     setEvents(classesData);
-   } catch (error) {
-     console.error(error);
-   }
- };
+  const messages = {
+    allDay: 'Hele dag',
+    previous: '<',
+    next: '>',
+    today: 'Vandaag',
+    month: 'Maand',
+    week: 'Week',
+    day: 'Dag',
+    agenda: 'Agenda',
+    date: 'Datum',
+    time: 'Tijd',
+    event: 'Gebeurtenis',
+    noEventsInRange: 'Geen gebeurtenissen in dit bereik.',
+    showMore: (total) => `+ ${total} meer`,
+  };
 
-
-
- const handleLogout = async () => {
-   try {
-     const { auth } = await initializeFirebaseApp();
-     await auth.signOut();
-     console.log('User logged out successfully');
-   } catch (error) {
-     console.error(error);
-   }
- };
-
- const messages = {
-   allDay: 'Hele dag',
-   previous: '<',
-   next: '>',
-   today: 'Vandaag',
-   month: 'Maand',
-   week: 'Week',
-   day: 'Dag',
-   agenda: 'Agenda',
-   date: 'Datum',
-   time: 'Tijd',
-   event: 'Gebeurtenis',
-   noEventsInRange: 'Geen gebeurtenissen in dit bereik.',
-   showMore: (total) => `+ ${total} meer`,
- };
-
- const formats = {
-   monthHeaderFormat: (date, culture, localizer) => localizer.format(date, 'MMMM YYYY', culture),
-   dayFormat: (date, culture, localizer) => localizer.format(date, 'D MMMM', culture),
- };
-
-
-
+  const formats = {
+    monthHeaderFormat: (date, culture, localizer) => localizer.format(date, 'MMMM YYYY', culture),
+    dayFormat: (date, culture, localizer) => localizer.format(date, 'D MMMM', culture),
+  };
 
   return (
     <div>
@@ -269,7 +250,7 @@ const generateClassId = (title) => {
           onSelectEvent={handleEventSelect}
         />
         {selectedEvent ? (
-          <div>
+          <AddClassWrapper>
             <h3>{selectedEvent.title}</h3>
             <p>Class ID: {selectedEvent.class_id}</p>
             <p>Docent: {selectedEvent.teacher}</p>
@@ -291,11 +272,11 @@ const generateClassId = (title) => {
               </div>
             )}
             <button id='delete-button'>Verwijder!</button>
-          </div>
+          </AddClassWrapper>
         ) : null}
-        <div>
+        <AddClassWrapper>
           <Form onSubmit={handleAddClass}>
-            <h3>Yogales Toevoegen:</h3>
+            <h3>Les Toevoegen:</h3>
             <label htmlFor='title'>Naam van de Yogales:</label>
             <input type='text' id='title' value={title} onChange={(e) => setTitle(e.target.value)} />
 
@@ -314,8 +295,10 @@ const generateClassId = (title) => {
             </label>
             <button type='submit'>Voeg toe!</button>
           </Form>
-        </div>
-        <UserList />
+        </AddClassWrapper>
+        <UserListWrapper>
+          <UserList />
+        </UserListWrapper>
         <div className='logoutButton'>
           <button onClick={handleLogout}>Uitloggen</button>
         </div>
@@ -326,10 +309,35 @@ const generateClassId = (title) => {
 
 
 const Wrapper = styled.div`
+  display: flex;
+  flex-basis: 50vw;
+  gap: 2rem;
+  border: 1px solid white;
+  padding: 1rem;
+  border-radius: 4px;
+`;
+
+const AddClassWrapper = styled.div`
 display: flex;
-flex-basis: 50vw;
-gap: 2rem;
-`
+flex-direction: column;
+border: 1px solid white;
+border-radius: 4px;
+min-width: 170px;
+padding: 2rem;
+
+
+`;
+const UserListWrapper = styled.div`
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+border: 1px solid white;
+border-radius: 4px;
+min-width: 170px;
+padding: 2rem;
+
+
+`;
 const Form = styled.form`
   display: flex;
   flex-direction: column;
@@ -364,7 +372,7 @@ const Form = styled.form`
     background-color: #333;
     color: #fff;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 12px;
     opacity: 0;
     left: 5rem;
@@ -391,4 +399,3 @@ const Form = styled.form`
     }
   }
 `;
-

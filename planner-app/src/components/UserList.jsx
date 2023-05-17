@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import AdminSignup from './AdminSignup';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import {styled} from 'styled-components'
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -27,7 +30,7 @@ const UserList = () => {
     try {
       const db = getFirestore();
       await deleteDoc(doc(db, 'users', id));
-      setUsers(users.filter((user) => user.id !== id));
+     setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (err) {
       setError(err.message);
     }
@@ -56,31 +59,45 @@ const UserList = () => {
   // Render the list of users
   const renderUsers = () => {
     return (
-      <div className='admin__users'>
-        <h2>Users</h2>
+      <UserLWrapper>
+        <h3>Ledenlijst:</h3>
         {users.length > 0 ? (
           <ul>
             {users.map((user) => (
               <li key={user.id}>
-                <span>{user.name} ({user.email})</span>
-                <button onClick={() => handleDelete(user.id)}>Delete</button>
+                <span>{user.name}  ({user.email}) </span>
+               <FontAwesomeIcon icon={faTrash} onClick={() => handleDelete(user.id)}>Delete</FontAwesomeIcon>
               </li>
             ))}
           </ul>
         ) : (
           <p>No users found.</p>
         )}
-      </div>
+      </UserLWrapper>
     );
   };
 
   return (
-    <div className='admin'>
+    <>
       {error && <p>{error}</p>}
       {renderSignup()}
       {renderUsers()}
-    </div>
+    </>
   );
 };
 
+
+const UserLWrapper = styled.div`
+  border: 1px solid white;
+  padding: 1rem;
+  border-radius: 4px;
+text-align: left;
+& h3 {
+  text-align: center;
+}
+
+ 
+`;
 export default UserList;
+
+
