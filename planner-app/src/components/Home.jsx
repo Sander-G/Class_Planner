@@ -9,6 +9,7 @@ import 'moment/locale/nl';
 import Modal from 'react-modal';
 import ClassInfoPopup from './ClassInfoPopup';
 import './Home.css'
+import { useNavigate } from 'react-router-dom'
 
 moment.locale('nl');
 const localizer = momentLocalizer(moment);
@@ -51,12 +52,13 @@ export default function Home() {
   const handleClosePopup = () => {
     setSelectedEvent(null);
   };
-
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       const { auth } = await initializeFirebaseApp();
       await auth.signOut();
       console.log('User logged out successfully');
+      navigate('/'); // Redirect to login
     } catch (error) {
       console.error(error);
     }
