@@ -1,5 +1,7 @@
 
+import './Home.css';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -8,8 +10,7 @@ import moment from 'moment';
 import 'moment/locale/nl'; 
 import Modal from 'react-modal';
 import ClassInfoPopup from './ClassInfoPopup';
-import './Home.css'
-import { useNavigate } from 'react-router-dom'
+
 
 moment.locale('nl');
 const localizer = momentLocalizer(moment);
@@ -17,8 +18,6 @@ const localizer = momentLocalizer(moment);
 Modal.setAppElement('#root');
 
 export default function Home() {
- 
- 
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -55,10 +54,13 @@ export default function Home() {
     setSelectedEvent(event);
     console.log('Selected event:', event);
   };
+
   const handleClosePopup = () => {
     setSelectedEvent(null);
   };
+  
   const navigate = useNavigate();
+  
   const handleLogout = async () => {
     try {
       const { auth } = await initializeFirebaseApp();
