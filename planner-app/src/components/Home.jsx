@@ -12,12 +12,13 @@ import Modal from 'react-modal';
 import ClassInfoPopup from './ClassInfoPopup';
 
 
-moment.locale('nl');
-const localizer = momentLocalizer(moment);
 
 Modal.setAppElement('#root');
 
 export default function Home() {
+ 
+ moment.locale('nl');
+ const localizer = momentLocalizer(moment);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
 

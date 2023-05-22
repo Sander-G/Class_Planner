@@ -3,20 +3,20 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { addDoc, collection } from 'firebase/firestore';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 
-const Signup = () => {
+const AdminSignup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedSubscription, setSelectedSubscription] = useState('')
-  const [agree, setAgree] = useState(false);
   const [error, setError] = useState(null);
-
+  const [isAdmin, setIsAdmin] = useState('')
   const handleNameChange = (e) => setName(e.target.value);
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
   const handleClassChange = (e) => setSelectedClass(e.target.value);
-  const handleAgreeChange = (e) => setAgree(e.target.checked);
+  const handleIsAdminChange = (e) => setIsAdmin(e.target.value)
+ 
   const handleSubscriptionChange = (e) => setSelectedSubscription(e.target.value);
 
   const handleSignup = async (e) => {
@@ -24,7 +24,7 @@ const Signup = () => {
     setError(null);
 
     // Validate input
-    if (!name || !email || !password || !selectedClass || !selectedSubscription || !agree) {
+    if (!name || !email || !password ) {
       setError('Alle velden invullen, alsjeblieft!');
       return;
     }
@@ -43,7 +43,8 @@ const Signup = () => {
         name,
         email,
         selectedClass,
-        selectedSubscription
+        selectedSubscription,
+        role: isAdmin ? 'admin' : 'user', // Set the role based on the checkbox value
       });
 
       console.log('Document written with ID:', userDocRef.id);
@@ -54,7 +55,6 @@ const Signup = () => {
 
   return (
     <div className='signupScreen'>
-      {<h1>Sign Up</h1>}
       {error && <p>{error}</p>}
       <form onSubmit={handleSignup}>
         <div className='input'>
@@ -100,13 +100,15 @@ const Signup = () => {
         </div>
         <div className='input'>
           <label>
-            <input type='checkbox' name='agree' checked={agree} onChange={handleAgreeChange} /> Ik ben het eens met de Algemene Voorwaarden.
+            <input type='checkbox' name='isAdmin' checked={isAdmin} onChange={handleIsAdminChange} />
+            Is Admin
           </label>
         </div>
+
         <button type='submit'>Inschrijven</button>
       </form>
     </div>
   );
 };
 
-export default Signup;
+export default AdminSignup;

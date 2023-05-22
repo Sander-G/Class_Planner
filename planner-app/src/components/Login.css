@@ -15,7 +15,10 @@ text-align: center;
 
 .loginScreen h1 {
   font-size: 2.5rem;
+}.logo {
+  max-width: 3 rem;
 }
+
 .input {
   display: flex;
   justify-content: flex-end;
@@ -26,7 +29,7 @@ text-align: center;
 
 .resetInput {
   display: flex;
-  
+  align-items: center;
   justify-content: center;
 }
 

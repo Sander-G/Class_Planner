@@ -20,8 +20,11 @@ function App() {
      const unsubscribe = auth.onAuthStateChanged((user) => {
        if (user) {
          // User is logged in, redirect to home page
-         navigate('/home');
-       } 
+         navigate('/admin');
+       } else {
+         // User is logged out, redirect to login page
+         navigate('/');
+       }
      });
      return unsubscribe;
    };

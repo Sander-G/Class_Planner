@@ -16,9 +16,11 @@
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-big-calendar": "^1.6.9",
+    "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",
-    "react-router-dom": "^6.11.0"
+    "react-router-dom": "^6.11.0",
+    "styled-components": "^6.0.0-rc.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
