@@ -70,7 +70,7 @@ export default function Admin() {
         deleteButton.removeEventListener('click', handleDeleteEvent);
       };
     }
-  }, [selectedEvent]);
+  });
 
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
