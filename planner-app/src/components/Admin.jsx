@@ -10,6 +10,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { styled } from 'styled-components';
 import UserList from './UserList';
 import EnrolledUsers from './EnrolledUsers';
+import {useNavigate}  from 'react-router-dom';
 
 export default function Admin() {
 moment.locale('nl');
@@ -176,6 +177,7 @@ const generateClassId = (title) => {
 
 
  const handleDeleteEvent = async (class_id) => {
+   console.log(class_id);
    try {
      const { db } = await initializeFirebaseApp();
      console.log(selectedEvent);
@@ -216,11 +218,13 @@ const generateClassId = (title) => {
  };
 
 
+const navigate = useNavigate();
 
  const handleLogout = async () => {
    try {
      const { auth } = await initializeFirebaseApp();
      await auth.signOut();
+     navigate('/');
      console.log('User logged out successfully');
    } catch (error) {
      console.error(error);
