@@ -10,13 +10,12 @@ const AdminSignup = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedSubscription, setSelectedSubscription] = useState('')
   const [error, setError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false);
   const handleNameChange = (e) => setName(e.target.value);
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
   const handleClassChange = (e) => setSelectedClass(e.target.value);
-  const handleIsAdminChange = (e) => setIsAdmin(e.target.value)
- 
+  const handleIsAdminChange = (e) => setIsAdmin(e.target.checked);
   const handleSubscriptionChange = (e) => setSelectedSubscription(e.target.value);
 
   const handleSignup = async (e) => {
@@ -52,7 +51,6 @@ const AdminSignup = () => {
       setError(err.message);
     }
   };
-
   return (
     <div className='signupScreen'>
       {error && <p>{error}</p>}

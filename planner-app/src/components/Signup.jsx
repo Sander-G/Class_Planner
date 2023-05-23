@@ -60,19 +60,19 @@ const Signup = () => {
         <div className='input'>
           <label>
             Name:
-            <input type='text' name='name' value={name} onChange={handleNameChange} />
+            <input type='text' name='name' autoComplete='new-name' value={name} onChange={handleNameChange} />
           </label>
         </div>
         <div className='input'>
           <label>
             Email:
-            <input type='email' name='email' value={email} onChange={handleEmailChange} />
+            <input type='email' name='email' autoComplete='new-email' value={email} onChange={handleEmailChange} />
           </label>
         </div>
         <div className='input'>
           <label>
             Password:
-            <input type='password' name='password' value={password} onChange={handlePasswordChange} />
+            <input type='password' name='password' autoComplete='new-password' value={password} onChange={handlePasswordChange} />
           </label>
         </div>
 

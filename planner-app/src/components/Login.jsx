@@ -1,11 +1,10 @@
-import './Login.css'
+import './Login.css';
 import { useState } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
-import { signInWithEmailAndPassword, sendPasswordResetEmail} from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-
-
+import PropTypes from 'prop-types';
 
 
 const SuccessMessage = styled.p`
@@ -35,9 +34,12 @@ const Spinner = styled.div`
   margin-right: 5px;
 `;
 
+function Login( {role} ) {
 
+  Login.propTypes = {
+    role: PropTypes.string,
+  };
 
-const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -45,8 +47,9 @@ const Login = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
-  const navigate = useNavigate();
+ 
 
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -59,12 +62,15 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log('Logged in as', user.uid);
-       navigate('/home');
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
     } catch (err) {
       setError(err.message);
     }
   };
-
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -78,7 +84,7 @@ const Login = () => {
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
 
   return (
     <div className='loginScreen'>
@@ -92,10 +98,9 @@ const Login = () => {
 
             <div className='resetInput'>
               <label>Email: </label>
-
               <input type='email' name='reset-email' className='input' autoComplete='email' value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
             </div>
-<div>
+            <div>
               <button type='submit' className='resetButton'>
                 {loading ? (
                   <>
@@ -108,8 +113,8 @@ const Login = () => {
             </div>
           </form>
 
+          <SuccessMessage show={showConfirmation}>Wachtwoord reset mail verzonden!</SuccessMessage>
           <p>
-              <SuccessMessage show={showConfirmation}>Wachtwoord reset mail verzonden!</SuccessMessage>
             <Link onClick={() => setShowResetForm(false)}>Terug naar inloggen</Link>
           </p>
         </>
@@ -132,15 +137,14 @@ const Login = () => {
           </form>
           <div className='bottomWrapper'>
             <Link onClick={() => setShowResetForm(true)}>Wachtwoord vergeten..</Link>
-
-            <p>
-              Nog geen account? <Link to='/signup'>Meld je aan!</Link>
-            </p>
+          <p>
+            Nog geen account? <Link to='signup'>Meld je aan!</Link>
+          </p>
           </div>
         </>
       )}
     </div>
   );
-};
+}
 
 export default Login;
