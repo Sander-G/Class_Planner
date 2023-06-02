@@ -242,7 +242,7 @@ const navigate = useNavigate();
 
   return (
     <div>
-      <img src='/public/logo.png' className='logo' alt='Lotta Yoga logo' />
+      <img src='logo.png' className='logo' alt='Lotta Yoga logo' />
       <h2>Admin Page</h2>
       <Wrapper>
         <Calendar
