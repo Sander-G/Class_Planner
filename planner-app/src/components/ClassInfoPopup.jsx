@@ -49,6 +49,7 @@ const ClassInfoPopup = ({ event }) => {
   console.log('enrolled users:', enrolledUsers)
   console.log('max spots', maxSpots)
 
+ 
 
 
   // handle the click on the cancel or enroll button
@@ -56,12 +57,16 @@ const ClassInfoPopup = ({ event }) => {
   const handleEnroll = async () => {
     const { db } = await initializeFirebaseApp();
     const { auth } = await initializeFirebaseApp();
+  
     if (auth.currentUser) {
       const userUid = auth.currentUser.uid;
+         console.log('User UID:', auth.currentUser.uid);
       const classRef = doc(db, 'classes', id);
       const classSnapshot = await getDoc(classRef);
       const classData = classSnapshot.data();
       if (classData) {
+        console.log('Class Data:', classData);
+        console.log('Enrolled Users:', classData.enrolled_users);
         if (classData.enrolled_users.includes(userUid)) {
           console.log('Already enrolled');
         } else if (classData.available_spots > 0) {
