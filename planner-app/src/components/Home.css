@@ -17,3 +17,11 @@
 .home-container {
     height: auto;
 }
+
+.logoutButton {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+
+}

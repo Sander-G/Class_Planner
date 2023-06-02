@@ -11,7 +11,7 @@ import { styled } from 'styled-components';
 import UserList from './UserList';
 import EnrolledUsers from './EnrolledUsers';
 import {useNavigate}  from 'react-router-dom';
-import './Admin.css'
+
 
 export default function Admin() {
   moment.locale('nl');

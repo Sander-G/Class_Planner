@@ -116,7 +116,7 @@ export default function Home() {
         {selectedEvent && <ClassInfoPopup event={selectedEvent} />}
       </Modal>
       <br />
-      <button onClick={handleLogout}>Logout</button>
+      <button className='logoutButton' onClick={handleLogout}>Logout</button>
     </div>
   );
 }
