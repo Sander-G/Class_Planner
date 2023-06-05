@@ -1,10 +1,26 @@
 import { useEffect, useState } from 'react';
-import { query, where, getDocs, collection } from 'firebase/firestore';
+import { query, where, getDocs, collection, doc, updateDoc } from 'firebase/firestore';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const EnrolledUsers = ({ selectedEvent }) => {
   const [enrolledUsersData, setEnrolledUsersData] = useState([]);
+
+  const removeUser = async (uid) => {
+    const { db } = await initializeFirebaseApp();
+
+    // Remove the user's UID from the enrolled_users array in Firestore
+    const eventRef = doc(db, 'classes', selectedEvent.id);
+    await updateDoc(eventRef, {
+      enrolled_users: selectedEvent.enrolled_users.filter((userUid) => userUid !== uid),
+    });
+
+    // Remove the user from the local state
+    const updatedEnrolledUsersData = enrolledUsersData.filter((user) => user.uid !== uid);
+    setEnrolledUsersData(updatedEnrolledUsersData);
+  };
 
   useEffect(() => {
     const fetchEnrolledUsersData = async () => {
@@ -45,9 +61,25 @@ const EnrolledUsers = ({ selectedEvent }) => {
 
   return (
     <div>
-      <h3>Enrolled Users:</h3>
+      <p>
+        Beschikbaar: {selectedEvent.max_spots - enrolledUsersData.length} van {selectedEvent.max_spots}
+      <br/> Deelnemers:
+      </p>
       {enrolledUsersData.map(({ uid, name }) => (
-        <p key={uid}>{name}</p>
+        <div key={uid}>
+          <p>
+            {name}&nbsp;
+            <FontAwesomeIcon
+              icon={faTrash}
+              onClick={() => {
+                if (window.confirm(`Weet je zeker dat je ${name} wil verwijderen van deze les?`)) {
+                  removeUser(uid);
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          </p>
+        </div>
       ))}
     </div>
   );

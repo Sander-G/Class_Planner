@@ -260,19 +260,20 @@ const navigate = useNavigate();
         {selectedEvent ? (
           <AddClassWrapper>
             <h3>{selectedEvent.title}</h3>
-            <p>Class ID: {selectedEvent.class_id}</p>
-            <p>Docent: {selectedEvent.teacher}</p>
             <p>
-              Beschikbare plaatsen: {selectedEvent.available_spots} van: {selectedEvent.max_spots}
+              {selectedEvent.start.toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })} tot&nbsp;
+              {selectedEvent.end.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', hour12: false })}
+           <br/>
+          ID: {selectedEvent.class_id}
+
+           <br/>
+           Docent: {selectedEvent.teacher}
+          <br/>
+           
+           
             </p>
-            {/* {selectedEvent.enrolled_users.map((uid) => (
-              <p key={uid}>{selectedEvent.name}</p>
-            ))} */}
-
+           
             <EnrolledUsers selectedEvent={selectedEvent} />
-            <p>{selectedEvent.start.toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' })}</p>
-            <p>{selectedEvent.end.toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' })}</p>
-
             {selectedEvent.recurring && (
               <div>
                 <input type='checkbox' id='deleteRecurring' />
