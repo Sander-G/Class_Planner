@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { initializeFirebaseApp } from '../../firebaseConfig';
 import { collection, getDocs, addDoc, writeBatch, query, where } from 'firebase/firestore';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import 'moment/locale/nl';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+
+
+
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { styled } from 'styled-components';
@@ -14,7 +16,7 @@ import {useNavigate}  from 'react-router-dom';
 
 
 export default function Admin() {
-  moment.locale('nl');
+ 
   const localizer = momentLocalizer(moment);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -30,6 +32,22 @@ export default function Admin() {
     const classId = `${title}_${randomNumber}`;
     return classId;
   };
+
+useEffect(() => {
+  moment.locale('nl');
+  moment.updateLocale('nl', {
+    week: {
+      dow: 1, // Monday is the first day of the week
+      doy: 4, // The week that contains Jan 4th is the first week of the year
+    },
+    weekdays: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],
+    weekdaysShort: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
+    weekdaysMin: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
+    months: ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
+  });
+  
+}, []);
+
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -235,44 +253,52 @@ const navigate = useNavigate();
     showMore: (total) => `+ ${total} meer`,
   };
 
+  // const formats = {
+  //   monthHeaderFormat: (date, culture, localizer) => localizer.format(date, 'MM YYYY', culture),
+  //   dayFormat: (date, culture, localizer) => localizer.format(date, 'D MMMM', culture),
+  // };
+
   const formats = {
-    monthHeaderFormat: (date, culture, localizer) => localizer.format(date, 'MMMM YYYY', culture),
-    dayFormat: (date, culture, localizer) => localizer.format(date, 'D MMMM', culture),
+    timeGutterFormat: 'H:mm', // Format for time slots in the time column
+    eventTimeRangeFormat: ({ start, end }, culture, local) => `${local.format(start, 'H:mm', culture)} - ${local.format(end, 'H:mm', culture)}`, // Format for event time range
+    agendaTimeRangeFormat: ({ start, end }, culture, local) => `${local.format(start, 'H:mm', culture)} - ${local.format(end, 'H:mm', culture)}`, // Format for agenda view time range
+    dayFormat: (date, culture, localizer) => `${localizer.format(date, 'ddd DD', culture)}`, // Custom format for day cells
   };
 
+  
   return (
     <div>
       <img src='logo.png' className='logo' alt='Lotta Yoga logo' />
       <h2>Admin Page</h2>
       <Wrapper>
-        <Calendar
-          localizer={localizer}
-          messages={messages}
-          formats={formats}
-          min={new Date(0, 0, 0, 10)} // 8:00 AM
-          max={new Date(0, 0, 0, 22)} // 10:00 PM
-          step={30}
-          defaultView='week'
-          views={['week', 'day']}
-          events={events}
-          onSelectEvent={handleEventSelect}
-        />
+        <CalendarWrapper>
+          <Calendar
+            localizer={localizer}
+            messages={messages}
+            formats={formats}
+            min={new Date(0, 0, 0, 10)} // 8:00 AM
+            max={new Date(0, 0, 0, 22)} // 10:00 PM
+            step={60}
+            defaultView='week'
+            views={['week', 'day']}
+            events={events}
+            onSelectEvent={handleEventSelect}
+           
+          />
+        </CalendarWrapper>
         {selectedEvent ? (
           <AddClassWrapper>
             <h3>{selectedEvent.title}</h3>
             <p>
               {selectedEvent.start.toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })} tot&nbsp;
               {selectedEvent.end.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', hour12: false })}
-           <br/>
-          ID: {selectedEvent.class_id}
-
-           <br/>
-           Docent: {selectedEvent.teacher}
-          <br/>
-           
-           
+              <br />
+              ID: {selectedEvent.class_id}
+              <br />
+              Docent: {selectedEvent.teacher}
+              <br />
             </p>
-           
+
             <EnrolledUsers selectedEvent={selectedEvent} />
             {selectedEvent.recurring && (
               <div>
@@ -406,5 +432,42 @@ const Form = styled.form`
     &:hover {
       background-color: #006b8e;
     }
+  }
+`;
+const CalendarWrapper = styled.div`
+  width: 400px;
+  height: 400px;
+  font-size: 14px;
+
+  .rbc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+  }
+  .rbc-btn-group {
+    & button {
+    font-size: 12px;
+    padding: 5px 5px;
+    max-width: 150px;
+    }
+  }
+  .rbc-time-header-gutter
+  {
+    width: 72.52px;
+  }
+
+  .rbc-row-content {
+    display: none;
+  }
+  .rbc-time-content {
+    border-top: 0px;
+  }
+  .rbc-toolbar-label {
+    font-size: 14px;
+    max-width: 150px;
+  }
+  .rbc-events-container {
+    width: 50px;
   }
 `;
