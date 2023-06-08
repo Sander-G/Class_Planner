@@ -265,7 +265,7 @@ const navigate = useNavigate();
     dayFormat: (date, culture, localizer) => `${localizer.format(date, 'ddd DD', culture)}`, // Custom format for day cells
   };
 
-  
+ 
   return (
     <div>
       <img src='logo.png' className='logo' alt='Lotta Yoga logo' />
@@ -306,7 +306,7 @@ const navigate = useNavigate();
                 <label htmlFor='deleteRecurring'>Delete all recurring events</label>
               </div>
             )}
-            <button id='delete-button'>Verwijder!</button>
+            <button id='delete-button'>Verwijder les!</button>
           </AddClassWrapper>
         ) : null}
         <AddClassWrapper>
@@ -443,17 +443,15 @@ const CalendarWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-
   }
   .rbc-btn-group {
     & button {
-    font-size: 12px;
-    padding: 5px 5px;
-    max-width: 150px;
+      font-size: 12px;
+      padding: 5px 5px;
+      max-width: 150px;
     }
   }
-  .rbc-time-header-gutter
-  {
+  .rbc-time-header-gutter {
     width: 72.52px;
   }
 
@@ -468,6 +466,18 @@ const CalendarWrapper = styled.div`
     max-width: 150px;
   }
   .rbc-events-container {
-    width: 50px;
+    width: 70px;
+    z-index:2;
+    
   }
+  .rbc-event .rbc-selected {
+    display: flex;
+    flex-direction: row-reverse;
+    height: 25%;
+  }
+  .rbc-event-label {
+      height: 35px;
+      display: none;
+    }
+ 
 `;
